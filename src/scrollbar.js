@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { PropTypes } from 'prop-types';
+import React, {Component} from 'react';
+import {PropTypes} from 'prop-types';
 import PerfectScrollbar from 'perfect-scrollbar';
 
 const handlerNameByEvent = {
@@ -80,7 +80,7 @@ export default class ScrollBar extends Component {
   }
 
   _updateClassName() {
-    const { className } = this.props;
+    const {className} = this.props;
 
     const psClassNames = this._container.className.split(' ')
       .filter(name => name.match(/^ps([-_].+|)$/))
@@ -98,6 +98,19 @@ export default class ScrollBar extends Component {
   handleRef(ref) {
     this._container = ref;
     this.props.containerRef(ref);
+    if (ref) {
+      try {
+        ref._getBoundingClientRect = ref.getBoundingClientRect;
+
+        ref.getBoundingClientRect = () => {
+          const original = ref._getBoundingClientRect();
+
+          return {...original, height: Math.round(original.height)};
+        };
+      } catch (e) {
+        console.log(e);
+      }
+    }
   }
 
   render() {
@@ -137,7 +150,8 @@ ScrollBar.defaultProps = {
   style: undefined,
   option: undefined,
   options: undefined,
-  containerRef: () => { },
+  containerRef: () => {
+  },
   onScrollY: undefined,
   onScrollX: undefined,
   onScrollUp: undefined,
